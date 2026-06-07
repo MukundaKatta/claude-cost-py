@@ -32,16 +32,21 @@ from claude_cost import (
         ("us.anthropic.claude-sonnet-4-5", "claude-sonnet-4-5"),
         ("eu.anthropic.claude-haiku-4-5", "claude-haiku-4-5"),
         ("apac.anthropic.claude-sonnet-4-5-v1:0", "claude-sonnet-4-5"),
+        ("global.anthropic.claude-sonnet-4-5", "claude-sonnet-4-5"),
         # Bedrock ARNs
         (
-            "arn:aws:bedrock:us-east-1::foundation-model/"
-            "anthropic.claude-sonnet-4-5-v1:0",
+            "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-5-v1:0",
             "claude-sonnet-4-5",
         ),
         (
             "arn:aws:bedrock:eu-west-1:123456789012:foundation-model/"
             "anthropic.claude-opus-4-7-v1:0",
             "claude-opus-4-7",
+        ),
+        # ARN wrapping an inference-profile-prefixed id (region-routed)
+        (
+            "arn:aws:bedrock:us-east-1::foundation-model/us.anthropic.claude-sonnet-4-5-v1:0",
+            "claude-sonnet-4-5",
         ),
         # Whitespace tolerance
         ("  claude-sonnet-4-5  ", "claude-sonnet-4-5"),
@@ -72,6 +77,15 @@ def test_default_pricing_known_model():
     assert p.cache_write_per_mtok == 3.75
 
 
+def test_default_pricing_haiku_4_5_rates():
+    p = default_pricing("claude-haiku-4-5")
+    assert p is not None
+    assert p.input_per_mtok == 1.00
+    assert p.output_per_mtok == 5.00
+    assert p.cache_read_per_mtok == 0.10
+    assert p.cache_write_per_mtok == 1.25
+
+
 def test_default_pricing_resolves_bedrock_variants():
     """Same canonical model, four different IDs — all return the same row."""
     base = default_pricing("claude-sonnet-4-5")
@@ -80,8 +94,7 @@ def test_default_pricing_resolves_bedrock_variants():
     assert default_pricing("us.anthropic.claude-sonnet-4-5") == base
     assert (
         default_pricing(
-            "arn:aws:bedrock:us-east-1::foundation-model/"
-            "anthropic.claude-sonnet-4-5-v1:0"
+            "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-sonnet-4-5-v1:0"
         )
         == base
     )

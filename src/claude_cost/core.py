@@ -95,9 +95,7 @@ _ANTHROPIC_PREFIX = "anthropic."
 _BEDROCK_VERSION_RE = re.compile(r"-v\d+(?::\d+)?$")
 
 # Bedrock ARN — capture the foundation-model component then re-run.
-_BEDROCK_ARN_RE = re.compile(
-    r"^arn:aws:bedrock:[^:]*:[^:]*:foundation-model/(?P<id>.+)$"
-)
+_BEDROCK_ARN_RE = re.compile(r"^arn:aws:bedrock:[^:]*:[^:]*:foundation-model/(?P<id>.+)$")
 
 
 def normalize_model_id(model_id: str) -> str:
